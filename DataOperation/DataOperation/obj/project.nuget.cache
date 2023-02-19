@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "0l8uVVkIydmAIwa+raJLfjzIk9ENDJ5OzhkXxY6Ozf/P9Vrn+l3vKyfVgVQCS2V1jaZ9PUh1S/eJGRT9B3f4lg==",
+  "dgSpecHash": "M3u53dmrE4bEJSMguOTEdgSpu6An92OHpxrUBlpoav8HJ1zAYofrzJCN+pa6hOJ6ws6VZFBHpsjcGAbfE7Y8wg==",
   "success": true,
   "projectFilePath": "E:\\Library\\Стажировка\\Readency\\Task1\\DataOperation-\\DataOperation\\DataOperation\\DataOperation.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\chuch\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512"
+  ],
   "logs": []
 }
