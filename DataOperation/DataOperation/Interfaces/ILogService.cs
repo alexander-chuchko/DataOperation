@@ -1,7 +1,7 @@
 ﻿
 namespace DataOperation.Interfaces
 {
-    internal interface ILogService
+    public interface ILogService
     {
         string LogPath { get; }
         void Write(string logInfo);
