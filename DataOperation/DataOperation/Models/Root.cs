@@ -12,6 +12,6 @@ namespace DataOperation.Models
         public List<Service> Services { get; set; }
 
         [JsonProperty("total")]
-        public decimal total { get; set; }
+        public decimal Total { get; set; }
     }
 }
