@@ -11,5 +11,10 @@ namespace DataOperation.Services
         {
             _logService = logService;   
         }
+
+        public string ReadFromLog()
+        {
+            return _logService.Read();
+        }
     }
 }
