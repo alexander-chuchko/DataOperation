@@ -8,8 +8,8 @@
           {
             "name": "John Doe",
             "payment": 500.0,
-            "date": "2022-10-01T00:00:00",
-            "account_number": 1234567
+            "date": "0001-01-01T00:00:00",
+            "account_number": 0
           }
         ],
         "total": 0.0
@@ -20,32 +20,50 @@
           {
             "name": "Mike Wiksen",
             "payment": 720.0,
-            "date": "2022-12-05T00:00:00",
-            "account_number": 7654321
-          },
-          {
-            "name": "Alex Chuchko",
-            "payment": 720.0,
-            "date": "2022-12-05T00:00:00",
-            "account_number": 7654321
+            "date": "0001-01-01T00:00:00",
+            "account_number": 0
           }
         ],
         "total": 0.0
       },
       {
-        "name": "Heat",
+        "name": "Parking",
         "payers": [
           {
-            "name": "Mike Wiksen",
-            "payment": 720.0,
-            "date": "2022-12-05T00:00:00",
-            "account_number": 7654321
-          },
+            "name": "Nick Potter",
+            "payment": 880.0,
+            "date": "0001-01-01T00:00:00",
+            "account_number": 0
+          }
+        ],
+        "total": 0.0
+      },
+      {
+        "name": "Gas",
+        "payers": [
+          {
+            "name": "Luke Pan,",
+            "payment": 40.0,
+            "date": "2022-12-07T00:00:00",
+            "account_number": 2222111
+          }
+        ],
+        "total": 0.0
+      }
+    ],
+    "total": 0.0
+  },
+  {
+    "city": "Oleksandriy",
+    "services": [
+      {
+        "name": "Water",
+        "payers": [
           {
             "name": "Alex Chuchko",
-            "payment": 720.0,
-            "date": "2022-12-05T00:00:00",
-            "account_number": 7654321
+            "payment": 650.0,
+            "date": "0001-01-01T00:00:00",
+            "account_number": 0
           }
         ],
         "total": 0.0

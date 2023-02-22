@@ -16,3 +16,17 @@ E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\Data
 E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\obj\Debug\net5.0\DataOperation.pdb
 E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\obj\Debug\net5.0\DataOperation.genruntimeconfig.cache
 E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\obj\Debug\net5.0\ref\DataOperation.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\DataOperation.dll.config
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Drawing.Common.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Security.AccessControl.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Security.Permissions.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\System.Windows.Extensions.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\unix\lib\netcoreapp3.1\System.Drawing.Common.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Drawing.Common.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\win\lib\netstandard2.0\System.Security.AccessControl.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+E:\Library\Стажировка\Readency\Task1\DataOperation-\DataOperation\DataOperation\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.1\System.Windows.Extensions.dll

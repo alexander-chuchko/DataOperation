@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace DataOperation.Services
 {
@@ -19,7 +20,8 @@ namespace DataOperation.Services
         // File accessed asynchronous reading and sequentially from beginning to end.
         private const FileOptions DefaultOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
 
-        public static string logFilePath = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
+        public static string logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], "transactions.log"); //$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
+        public static string logFilePath1 =$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
         public string LogPath => throw new System.NotImplementedException();
 
         public string Read()
@@ -42,15 +44,15 @@ namespace DataOperation.Services
                 "There are no recorded transactions";
         }
 
-        public void Write(string logInfo)
+        public void Write(string logInfo, string path)
         {
-            if (!string.IsNullOrEmpty(logFilePath) && !string.IsNullOrEmpty(logInfo))
+            if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(logInfo))
             {
                 string formattedString = string.Concat(logInfo, "\n");
 
-                bool isFile = File.Exists(logFilePath);
+                bool isFile = File.Exists(path);
 
-                using (StreamWriter write = new StreamWriter(logFilePath, isFile))
+                using (StreamWriter write = new StreamWriter(path, isFile))
                 {
                     write.Write(formattedString);
                 }

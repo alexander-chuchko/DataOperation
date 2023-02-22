@@ -2,6 +2,7 @@
 using DataOperation.Services;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -24,11 +25,17 @@ namespace DataOperation
         } 
         static void Main(string[] args)
         {
-            PaymentService paymentService = new PaymentService(new LogService());
-            paymentService.StartProgramm();
-            //MockService mockService = new MockService(new LogService());
 
-            LogService logService = new LogService();
+
+            DriveInfo[] allDrives = DriveInfo.GetDrives();
+            string fileName = System.IO.Path.GetRandomFileName();
+            MockService mockService = new MockService(new LogService());
+
+            //PaymentService paymentService = new PaymentService(new LogService());
+            //paymentService.StartProgramm();
+
+
+            //LogService logService = new LogService();
             //GetAllStrings();
 
             string arrayTransaction = "John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water"; //paymentService.ReadFromLog();
