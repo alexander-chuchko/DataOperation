@@ -8,7 +8,7 @@ namespace DataOperation.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("date")]
+        [JsonProperty("payment")]
         public decimal Payment { get; set; }
 
         [JsonProperty("date")]

@@ -5,6 +5,11 @@ namespace DataOperation.Models
 {
     public class Service
     {
+        public Service()
+        {
+            Payers = new List<Payer>();
+        }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 

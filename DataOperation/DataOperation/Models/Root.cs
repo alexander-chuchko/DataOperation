@@ -5,6 +5,11 @@ namespace DataOperation.Models
 {
     public class Root
     {
+        public Root()
+        {
+            Services = new List<Service>();
+        }
+
         [JsonProperty("city")]
         public string City { get; set; }
 

@@ -1,25 +1,64 @@
-﻿using DataOperation.Services;
+﻿using DataOperation.Models;
+using DataOperation.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace DataOperation
 {
     public class Program
     {
+        private static void GetAllStrings()
+        {
+            LogService logService = new LogService();
+            Task<string> getAllStrings = logService.ReadAllTextAsync();
+            getAllStrings.ContinueWith(_ => 
+            {
+                var lists = getAllStrings.Result;
+
+                Console.WriteLine("HelloWWWWWWWWWWWWWWW");
+            });
+
+        } 
         static void Main(string[] args)
         {
-            //PaymentService paymentService = new PaymentService(new LogService());
+            PaymentService paymentService = new PaymentService(new LogService());
+            paymentService.StartProgramm();
             //MockService mockService = new MockService(new LogService());
 
-            PaymentService paymentService = new PaymentService(new LogService());
+            LogService logService = new LogService();
+            //GetAllStrings();
 
+            string arrayTransaction = "John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water"; //paymentService.ReadFromLog();
+            //var transactions2 = arrayTransaction.Split(new string[] { ", ", "“", "”", " "}, StringSplitOptions.RemoveEmptyEntries);
 
-            string arrayTransaction = paymentService.ReadFromLog();
+            //var transactions = arrayTransaction.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var transactions = arrayTransaction.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            //var transactions1 = transactions[1].Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
+            /*
+            List<Root> roots = new List<Root>();
 
-            var transactions1 = transactions[1].Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var item in transactions)
+            {
+                var arrayWords = item.Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
+                Payer payer = new Payer()
+                {
+                    Name = String.Concat(arrayWords[0],
+                    arrayWords[1]),
+                    Payment = Decimal.Parse(arrayWords[6]),
+                    AccountNumber = int.Parse(arrayWords[7]),
+                    Date = DateTime.Parse(arrayWords[8]),
+                };
+                
+
+                Root root = new Root(); 
+                root.City = arrayWords[3];
+
+            }
+            */
+
 
             //"John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water",
 

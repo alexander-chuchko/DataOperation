@@ -1,0 +1,56 @@
+[
+  {
+    "city": "Lviv",
+    "services": [
+      {
+        "name": "Water",
+        "payers": [
+          {
+            "name": "John Doe",
+            "payment": 500.0,
+            "date": "2022-10-01T00:00:00",
+            "account_number": 1234567
+          }
+        ],
+        "total": 0.0
+      },
+      {
+        "name": "Heat",
+        "payers": [
+          {
+            "name": "Mike Wiksen",
+            "payment": 720.0,
+            "date": "2022-12-05T00:00:00",
+            "account_number": 7654321
+          },
+          {
+            "name": "Alex Chuchko",
+            "payment": 720.0,
+            "date": "2022-12-05T00:00:00",
+            "account_number": 7654321
+          }
+        ],
+        "total": 0.0
+      },
+      {
+        "name": "Heat",
+        "payers": [
+          {
+            "name": "Mike Wiksen",
+            "payment": 720.0,
+            "date": "2022-12-05T00:00:00",
+            "account_number": 7654321
+          },
+          {
+            "name": "Alex Chuchko",
+            "payment": 720.0,
+            "date": "2022-12-05T00:00:00",
+            "account_number": 7654321
+          }
+        ],
+        "total": 0.0
+      }
+    ],
+    "total": 0.0
+  }
+]
