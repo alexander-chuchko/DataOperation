@@ -9,7 +9,7 @@ namespace DataOperation.Interfaces
     {
         string LogPath { get; }
         void Write(string logInfo, string path);
-        string Read();
+        string Read(string path);
         Task<string> ReadAllTextAsync();
         Task WriteToJSONAsync(IEnumerable<Root> collection);
     }

@@ -1,5 +1,8 @@
 ﻿
+using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace DataOperation.Helpers
 {
@@ -9,20 +12,36 @@ namespace DataOperation.Helpers
         private static Regex patternPayment;
         private static Regex patternName;
         private static Regex patternAccountNumber;
+        private static Regex patternExtensions;
+        Regex regex = new Regex(@"(((0|1)[0-9]|2[0-9]|3[0-1])\/(0[1-9]|1[0-2])\/((19|20)\d\d))$");
 
         static Validation()
         {
-            patternDate = new Regex(@"^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
-            patternPayment = new Regex(@"^[0 - 9]([.,][0 - 9]{ 1, 3 })?$");
-            patternAccountNumber = new Regex(@"^[0-9]{6}$");
+            patternDate = new Regex(@"[0-9]{4}-[0?[1-9]|[12]\\d|3[01]");//new Regex(@"^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
+            patternPayment = new Regex(@"^(\d*\.)?\d+$"); //new Regex(@"^-?[0-9]*\\.?[0-9]+$");//new Regex(@"^[0 - 9]([.,][0 - 9]{ 1, 3 })?$");
+            patternAccountNumber = new Regex(@"^[0-9]{7}$");
             patternName = new Regex(@"^[A-Z]([a-z][A-Z]?){2,15}$");
+            patternExtensions = new Regex(@"(\w+)\.(txt|csv)$");
+
         }
 
-        public static bool IsValidPayment(string id)
+        private static bool IsValidExtension(string path)
         {
             var validationResult = false;
 
-            if (patternPayment.IsMatch(id))
+            if (patternPayment.IsMatch(path))
+            {
+                validationResult = true;
+            }
+
+            return validationResult;
+        }
+
+        private static bool IsValidPayment(string payment)
+        {
+            var validationResult = false;
+
+            if (patternPayment.IsMatch(payment))
             {
                 validationResult = true;
             }
@@ -30,11 +49,18 @@ namespace DataOperation.Helpers
             return validationResult;
         }
         
-        public static bool IsValidDate(string id)
+        private static bool IsValidDate(string date)
+        {
+            DateTime dt;
+
+            return DateTime.TryParseExact(date, "yyyy-MM-dd", new CultureInfo("en-US"), DateTimeStyles.None, out dt);
+        }
+
+        private static bool IsValidName(string name)
         {
             var validationResult = false;
 
-            if (patternDate.IsMatch(id))
+            if (patternName.IsMatch(name))
             {
                 validationResult = true;
             }
@@ -42,11 +68,11 @@ namespace DataOperation.Helpers
             return validationResult;
         }
 
-        public static bool IsValidName(string id)
+        private static bool IsValidAccountNumber(string accountNumber)
         {
             var validationResult = false;
 
-            if (patternName.IsMatch(id))
+            if (patternAccountNumber.IsMatch(accountNumber))
             {
                 validationResult = true;
             }
@@ -54,16 +80,40 @@ namespace DataOperation.Helpers
             return validationResult;
         }
 
-        public static bool IsValidAccountNumber(string id)
+        public static bool CheckParametr(int indexParametr, string parametr)
         {
-            var validationResult = false;
+            bool isValid = true;
 
-            if (patternAccountNumber.IsMatch(id))
+            switch (indexParametr)
             {
-                validationResult = true;
+
+                case 0:
+                    isValid = IsValidName(parametr);
+                    break;
+                case 1:
+                    isValid = IsValidName(parametr);
+                    break;
+                case 2:
+                    isValid = IsValidName(parametr);
+                    break;
+                case 6:
+                    isValid = IsValidPayment(parametr);
+                    break;
+
+                case 7:
+                    isValid = IsValidDate(parametr);
+                    break;
+
+                case 8:
+                    isValid = IsValidAccountNumber(parametr);
+                    break;
+
+                case 9:
+                    isValid = IsValidName(parametr);
+                    break;
             }
 
-            return validationResult;
+            return isValid;
         }
     }
 }

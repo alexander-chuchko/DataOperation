@@ -24,16 +24,16 @@ namespace DataOperation.Services
         public static string logFilePath1 =$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
         public string LogPath => throw new System.NotImplementedException();
 
-        public string Read()
+        public string Read(string path)
         {
             string readTransactions = null;
 
-            if (!File.Exists(logFilePath))
+            if (!File.Exists(path))
             {
                 throw new System.InvalidOperationException();
             }
 
-            using (var file = new StreamReader(logFilePath))
+            using (var file = new StreamReader(path))
             {
                 //To make async method
                 readTransactions = file.ReadToEnd();
@@ -41,7 +41,7 @@ namespace DataOperation.Services
 
             return readTransactions?.Length > default(int) ?
                 readTransactions :
-                "There are no recorded transactions";
+                "There are no recorded payments";
         }
 
         public void Write(string logInfo, string path)
