@@ -8,7 +8,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 
@@ -59,13 +58,15 @@ namespace DataOperation.Services
             }
         }
 
-        public async Task WriteToJSONAsync(IEnumerable<Root> collection)
+        public async Task WriteToJSONAsync(IEnumerable<Root> collection, string path)
         {
             try
             {
-                await File.WriteAllTextAsync(logFilePath, JsonConvert.SerializeObject(collection,
+                await File.WriteAllTextAsync(path, JsonConvert.SerializeObject(collection,
                     Formatting.Indented,
-                    new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+                    new JsonSerializerSettings { DateFormatString = "yyyy-MM-dd", 
+                        ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+
             }
             catch (Exception ex)
             {

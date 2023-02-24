@@ -11,6 +11,6 @@ namespace DataOperation.Interfaces
         void Write(string logInfo, string path);
         string Read(string path);
         Task<string> ReadAllTextAsync();
-        Task WriteToJSONAsync(IEnumerable<Root> collection);
+        Task WriteToJSONAsync(IEnumerable<Root> collection, string path);
     }
 }

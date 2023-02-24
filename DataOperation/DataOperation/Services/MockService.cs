@@ -66,7 +66,7 @@ namespace DataOperation.Services
 
                     if (i % NUMBER_PAYMENTS == 0)
                     {
-                        logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], CreateName());
+                        logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], CreateName(i));
                     }
 
                     _logService.Write(payer, logFilePath);
@@ -84,13 +84,13 @@ namespace DataOperation.Services
             }
         }
 
-        public string CreateName()
+        public string CreateName(int index)
         {
             Random random = new Random();
             string extension = random.Next(0, 9) % 2 == 0 ?
             ".TXT" :
             ".CSV";
-            return Guid.NewGuid().ToString() + extension;
+            return $"source{index}extension";
         }
     }
 }

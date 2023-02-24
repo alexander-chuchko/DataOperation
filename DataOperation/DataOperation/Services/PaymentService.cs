@@ -13,6 +13,7 @@ using System.Configuration;
 using DataOperation.Helpers;
 using static System.Net.WebRequestMethods;
 using Microsoft.VisualBasic;
+using System.Xml.Linq;
 
 namespace DataOperation.Services
 {
@@ -81,6 +82,8 @@ namespace DataOperation.Services
         //Do async method
         public void CheckOrWriteFile(IEnumerable<FileInfo> files)
         {
+            int index = 1;
+
             foreach (var file in files)
             {
                 var contentFile = _logService.Read(file.FullName);
@@ -88,20 +91,27 @@ namespace DataOperation.Services
                 //Case - When the file is empty
                 if ("There are no recorded payments" == contentFile)
                 {
+                    Report.InvalidFiles.Add(file.FullName);
                     continue;
                 }
                 else
                 {
-                    CheckLines(contentFile, file.FullName);
+                    ParseLines(contentFile, file.FullName);
+                    SaveFile(index);
+
+                    if (roots.Count > 0)
+                    {
+                        roots.Clear();
+                    }
+
+                    index++;
                 }
             }
         }
 
-        public void CheckLines(string contentFile, string path)
+        public void ParseLines(string contentFile, string path)
         {
             int foundErrors = 0;
-
-            string invalidFiles = string.Empty;
 
             string[] fileLines = contentFile.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -113,9 +123,7 @@ namespace DataOperation.Services
 
                     if (parametrs.Length == 10 && CheckParametersLine(parametrs))
                     {
-                        //Занести строки валидные строки, которые необходимо парсить
-                        //передавать строки на конвертацию в модел и после запись в json
-
+                        CreateModel(parametrs);
                     }
                     else
                     {
@@ -139,9 +147,9 @@ namespace DataOperation.Services
         {
             string nameFile = "meta.log";
 
-            DateTime dateTime = DateTime.Now;
-            string name = dateTime.ToString("dd-MM-yyyy");
-            var startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
+            //DateTime dateTime = DateTime.Now;
+            //string name = dateTime.ToString("dd-MM-yyyy");
+            var startFolder = GetPathFolder(); //Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
 
             CreateFolder(startFolder);
 
@@ -179,44 +187,49 @@ namespace DataOperation.Services
             return isValid;
         }
 
-        public string SelectInvalidFiles()
-        {
-            return string.Empty;
-        }
-
-        public void StartProgramm1()
+        public void StartProgramm()
         {
             var files = SelectFiles();
 
             if (files.Count() > 0)
             {
                 CheckOrWriteFile(files);
+                //GetPathFolder();
                 WriteReport();
             }
             else
             {
-            
+                Console.WriteLine("No files");
             }
         }
 
-
-        public void StartProgramm(string path)
+        private string GetPathFolder()
         {
-            var allStrings = ReadFromLog(path).Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            DateTime dateTime = DateTime.Now;
+            string name = dateTime.ToString("dd-MM-yyyy");
+            var startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
 
-            foreach (var item in allStrings)
+            return startFolder;
+        }
+
+        public void SaveFile(int index) 
+        {
+            string path = GetPathFolder();
+            CreateFolder(path);
+            var startFolder = Path.Combine(path, $"output{index}.json");
+            _logService.WriteToJSONAsync(roots, startFolder);
+        }
+
+        public void CreateModel(string[] parametrs)
+        {
+            if (parametrs is not null) 
             {
-                var parametrs = SplitString(item);
-
                 //Created Root
                 var root = CreateOrGetRoot(parametrs);
-
                 //Created Service
                 var service = CreateOrGetService(parametrs);
-
-                //roots.Add();
                 //Created Payer
-                var payer =  CreatePayment(parametrs);
+                var payer = CreatePayment(parametrs);
 
                 service.Payers.Add(payer);
                 root.Services.Add(service);
@@ -228,33 +241,7 @@ namespace DataOperation.Services
                     roots.Add(root);
                 }
                 string path1 = $@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\output.log";
-                try
-                {
-                    var obj = JsonConvert.SerializeObject(roots);
-                    Console.WriteLine(obj);
-                    //File.WriteAllText(path1, JsonConvert.SerializeObject(roots, Formatting.Indented, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() }));
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine("Error:" + ex.Message);
-                }
-                
-
-                /*
-                service.Payers.Add(payer);
-                service.Name = parametrs[9];
-                service.Total = 120.0058m;
-
-                root.City = parametrs[2];
-                root.Total = 120.0058m;
-                root.Services.Add(service);*/
             }
-
-            //var transactions2 = arrayTransaction.Split(new string[] { ", ", "“", "”", " " }, StringSplitOptions.RemoveEmptyEntries);
-
-            //var transactions = arrayTransaction.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            //var transactions1 = transactions[1].Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public string[] SplitString(string paymentData)
@@ -264,31 +251,13 @@ namespace DataOperation.Services
             return parametrs;
         }
 
-        public bool ExecuteValidation(string[] paymentData)
-        {
-            bool isResult = false;
-
-            if (paymentData.Length > 9)
-            {
-                isResult = true;    
-            }
-
-
-            foreach (var parametr in paymentData)
-            {
-                
-            }   
-
-            return false;
-        }
-
         public Payer CreatePayment(string[] dataPayment)
         {
             Payer payer = new Payer();
 
             try
             {
-                payer.Name = string.Concat(dataPayment[0], ' ', dataPayment[1]);
+                payer.Name = $"{dataPayment[0]} {dataPayment[1]}";
                 payer.Payment = decimal.Parse(dataPayment[6], CultureInfo.InvariantCulture);
                 payer.Date = ConvertDate(dataPayment[7]);
                 payer.AccountNumber = long.Parse(dataPayment[8]);
@@ -340,14 +309,10 @@ namespace DataOperation.Services
 
         private DateTime ConvertDate(string data)
         {
-            int[] arrayData = new int[3];
+            DateTime date;
+            DateTime.TryParseExact(data, "yyyy-MM-dd", new CultureInfo("en-US"), DateTimeStyles.None, out date);
 
-            if (!string.IsNullOrEmpty(data))
-            {
-                arrayData = data.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
-            }
-
-            return new DateTime(arrayData[0], arrayData[1], arrayData[2]);
+            return date;
         }
     }
 }
