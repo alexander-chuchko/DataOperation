@@ -35,7 +35,9 @@ namespace DataOperation
             PaymentService paymentService = new PaymentService(new LogService());
             //en-GB
             //en-US
-
+            DateTime dateTime = DateTime.Now;
+            var res = dateTime.ToString("dd-mm-yyyy");
+            string name = string.Concat(dateTime.Day, '-', dateTime.Month, '-', dateTime.Year).ToString();
             paymentService.StartProgramm1();
             //paymentService.StartProgramm();
 

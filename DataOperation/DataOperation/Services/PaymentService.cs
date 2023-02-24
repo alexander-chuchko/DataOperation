@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Configuration;
 using DataOperation.Helpers;
 using static System.Net.WebRequestMethods;
+using Microsoft.VisualBasic;
 
 namespace DataOperation.Services
 {
@@ -70,8 +71,8 @@ namespace DataOperation.Services
                 }
             }
 
-            Report.ParsedFiles = files.Count();
-            Report.InvalidFiles = GetPathsInvalidFiles(dir);
+            //Report.ParsedFiles = files.Count();
+            //Report.InvalidFiles = GetPathsInvalidFiles(dir);
 
             return string.Concat('[', pathsInvalid,']');
         }
@@ -91,12 +92,12 @@ namespace DataOperation.Services
                 }
                 else
                 {
-                    CheckLines(contentFile);
+                    CheckLines(contentFile, file.FullName);
                 }
             }
         }
 
-        public void CheckLines(string contentFile)
+        public void CheckLines(string contentFile, string path)
         {
             int foundErrors = 0;
 
@@ -108,7 +109,7 @@ namespace DataOperation.Services
             {
                 for (int i = 0; i < fileLines.Length; i++)
                 {
-                    string [] parametrs = SplitString(fileLines[i]);
+                    string[] parametrs = SplitString(fileLines[i]);
 
                     if (parametrs.Length == 10 && CheckParametersLine(parametrs))
                     {
@@ -126,6 +127,37 @@ namespace DataOperation.Services
 
                 Report.FoundErrors += foundErrors;
                 Report.ParsedFiles++;
+
+                if (Report.FoundErrors > 0)
+                {
+                    Report.InvalidFiles.Add(path);
+                }
+            }
+        }
+
+        public void WriteReport() 
+        {
+            string nameFile = "meta.log";
+
+            DateTime dateTime = DateTime.Now;
+            string name = dateTime.ToString("dd-MM-yyyy");
+            var startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
+
+            CreateFolder(startFolder);
+
+            string report = $"parsed_files: {Report.ParsedFiles}\n" +
+                $"parsed_lines: {Report.ParsedLines}\n" +
+                $"found_errors: {Report.FoundErrors} \n" +
+                $"invalid_files: [{string.Join(", ", Report.InvalidFiles)}]";
+
+            _logService.Write(report, Path.Combine(startFolder,nameFile));
+        }
+
+        public void CreateFolder(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
         }
 
@@ -159,6 +191,7 @@ namespace DataOperation.Services
             if (files.Count() > 0)
             {
                 CheckOrWriteFile(files);
+                WriteReport();
             }
             else
             {
