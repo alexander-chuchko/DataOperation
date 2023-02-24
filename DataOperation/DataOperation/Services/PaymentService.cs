@@ -20,14 +20,15 @@ namespace DataOperation.Services
     public class PaymentService
     {
         private readonly ILogService _logService;
+        private readonly IMockService _mockService;
         public List<Root> roots { get; set; } = new List<Root>();
-        //public Dictionary<string, string> Report { get; set; } = new Dictionary<string, string>();
 
         public Report Report {get; set;} = new Report();  
 
-        public PaymentService(ILogService logService)
+        public PaymentService(ILogService logService, IMockService mockService)
         {
             _logService = logService;   
+            _mockService = mockService; 
         }
 
         public string ReadFromLog(string path)
@@ -189,12 +190,12 @@ namespace DataOperation.Services
 
         public void StartProgramm()
         {
+
             var files = SelectFiles();
 
             if (files.Count() > 0)
             {
                 CheckOrWriteFile(files);
-                //GetPathFolder();
                 WriteReport();
             }
             else
@@ -205,9 +206,19 @@ namespace DataOperation.Services
 
         private string GetPathFolder()
         {
-            DateTime dateTime = DateTime.Now;
-            string name = dateTime.ToString("dd-MM-yyyy");
-            var startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
+            string startFolder = null;
+
+            try
+            {
+                DateTime dateTime = DateTime.Now;
+                string name = dateTime.ToString("dd-MM-yyyy");
+                startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"], name);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error:"+ ex.Message);
+            }
+
 
             return startFolder;
         }

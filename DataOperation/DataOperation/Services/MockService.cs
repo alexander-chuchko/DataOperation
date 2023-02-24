@@ -6,16 +6,16 @@ using System.IO;
 
 namespace DataOperation.Services
 {
-    public class MockService
+    public class MockService : IMockService
     {
         public const int ITEM_GENERATION_FILE = 3;
         public const int NUMBER_PAYMENTS = 3;
 
         private readonly ILogService _logService;
+
         public MockService(ILogService logService)
         {
             _logService = logService;
-            StartGeneration();
         }
 
         private List<string> GetPayers()
@@ -36,19 +36,19 @@ namespace DataOperation.Services
             };
         }
 
-        private void StartGeneration()
+        public void GenerationMock()
         {
             try
             {
-                CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"]));
-                CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"]));
+                _logService.CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"]));
+                _logService.CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"]));
+
+                CreatePayerFiles(GetPayers());
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error"+ ex.Message);
             }
-
-            CreatePayerFiles(GetPayers());
         }
 
         private void CreatePayerFiles(IEnumerable<string>colection)
@@ -76,15 +76,7 @@ namespace DataOperation.Services
             }
         }
 
-        public void CreateFolder(string path)
-        {
-            if (!string.IsNullOrEmpty(path) &&!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-        }
-
-        public string CreateName(int index)
+        private string CreateName(int index)
         {
             Random random = new Random();
             string extension = random.Next(0, 9) % 2 == 0 ?

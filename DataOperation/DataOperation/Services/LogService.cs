@@ -21,7 +21,6 @@ namespace DataOperation.Services
 
         public static string logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], "transactions.log"); //$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
         public static string logFilePath1 =$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
-        public string LogPath => throw new System.NotImplementedException();
 
         public string Read(string path)
         {
@@ -88,6 +87,14 @@ namespace DataOperation.Services
                 }    
 
                 return sb.ToString();
+            }
+        }
+
+        public void CreateFolder(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
         }
     }

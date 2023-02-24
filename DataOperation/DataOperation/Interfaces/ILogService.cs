@@ -7,10 +7,10 @@ namespace DataOperation.Interfaces
 {
     public interface ILogService
     {
-        string LogPath { get; }
         void Write(string logInfo, string path);
         string Read(string path);
         Task<string> ReadAllTextAsync();
         Task WriteToJSONAsync(IEnumerable<Root> collection, string path);
+        void CreateFolder(string path);
     }
 }
