@@ -240,7 +240,7 @@ namespace DataOperation
            PaymentService paymentService = new PaymentService(new LogService(), new MockService(new LogService()), new TimerService());
             //MockService mockService = new MockService(new LogService());
             //mockService.GenerationMock();
-           await paymentService.StartProgramm();
+           await paymentService.StartProgrammAsync();
            Console.ReadKey();
         }
     }

@@ -71,7 +71,7 @@ namespace DataOperation.Services
             {
                 LastlyState = addedFiles.ToList();
 
-                await StartProgramm(SelectFiles().Count() - addedFiles.Count());
+                await StartProgrammAsync(SelectFiles().Count() - addedFiles.Count());
             }
         }
 
@@ -213,7 +213,7 @@ namespace DataOperation.Services
             return isValid;
         }
 
-        public async Task StartProgramm(int index = 0)
+        public async Task StartProgrammAsync(int index = 0)
         {
             List<FileInfo> files = null;
 
