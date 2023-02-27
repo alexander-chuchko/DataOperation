@@ -21,17 +21,17 @@ namespace DataOperation.Services
         public List<Root> roots { get; set; } = new List<Root>();
 
         public Report Report {get; set;} = new Report();
-        public string[] LastlyState { get; set; }
+        public List<FileInfo> LastlyState { get; set; }
 
         public PaymentService(ILogService logService, IMockService mockService, ITimerService checkTimer)
         {
             _logService = logService;   
             _mockService = mockService; 
-            _checkTimer = checkTimer;   
-            
+            _checkTimer = checkTimer;
+            _checkTimer.Elapsed += UpdateFolder;
         }
 
-        public IEnumerable<FileInfo> SelectFiles()
+        private IEnumerable<FileInfo> SelectFiles()
         {
             string invalidFiles = string.Empty;
 
@@ -45,11 +45,6 @@ namespace DataOperation.Services
             {
                 files = dir.GetFiles("*.*", SearchOption.AllDirectories).Where(x =>
                             (x.Extension.ToLower() == ".txt") || (x.Extension.ToLower() == ".csv"));
-                if ()
-                {
-                    LastlyState = new string[files.Count()];
-                    LastlyState = files.Select(x => x.FullName).ToArray();
-                }
             }
 
             return files;
@@ -68,7 +63,41 @@ namespace DataOperation.Services
             }
         }
 
-        public async Task<string[]> ReadFile(IEnumerable<FileInfo> files)
+        private async void UpdateFolder(object sender, ElapsedEventArgs e)
+        {
+            var addedFiles = GetAddedFiles();
+            
+            if (addedFiles != null && addedFiles.Count() > 0)
+            {
+                LastlyState = addedFiles.ToList();
+
+                await StartProgramm(SelectFiles().Count() - addedFiles.Count());
+            }
+        }
+
+        public void DeleteFiles(string path)
+        {
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (di.GetFiles().Count() > 0)
+            {
+                di.GetFiles("*.pdf").ToList().ForEach(file => file.Delete());
+            }
+        }
+
+        private IEnumerable<FileInfo> GetAddedFiles()
+        {
+            List<FileInfo> addedFiles = null;
+            var files = SelectFiles();
+
+            if (files.Count() > 0)
+            {
+                addedFiles = LastlyState.Except(files).ToList();
+            }
+
+            return addedFiles;
+        }
+
+        private async Task<string[]> ReadFile(IEnumerable<FileInfo> files)
         {
             IEnumerable<Task<string>> tasks = files.Select(x => x.FullName).Select(_logService.ReadAsync).ToList();
             Task<string[]> allTask = Task.WhenAll(tasks);
@@ -77,7 +106,7 @@ namespace DataOperation.Services
             return strings;
         }
         
-        public async Task CheckOrWriteFile(string contentFile, string fullName, int index)
+        private async Task CheckOrWriteFile(string contentFile, string fullName, int index)
         {
             if ("There are no recorded payments" == contentFile)
             {
@@ -104,7 +133,7 @@ namespace DataOperation.Services
             }
         }
 
-        public List<string[]> ParseAndCheckLines(string contentFile, string path)
+        private List<string[]> ParseAndCheckLines(string contentFile, string path)
         {
             List<string[]> strings = new List<string[]>();  
 
@@ -142,7 +171,7 @@ namespace DataOperation.Services
             return strings;
         }
 
-        public async Task WriteReport() 
+        private async Task WriteReport() 
         {
             string nameFile = "meta.log";
 
@@ -155,12 +184,10 @@ namespace DataOperation.Services
                 $"found_errors: {Report.FoundErrors} \n" +
                 $"invalid_files: [{string.Join(", ", Report.InvalidFiles)}]";
 
-
-            //Change
             await _logService.WriteAsync(report, Path.Combine(startFolder,nameFile));
         }
 
-        public void CreateFolder(string path)
+        private void CreateFolder(string path)
         {
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
             {
@@ -168,7 +195,7 @@ namespace DataOperation.Services
             }
         }
 
-        public bool CheckParametersLine(string []parametrs)
+        private bool CheckParametersLine(string []parametrs)
         {
             bool isValid = true;  
             
@@ -186,15 +213,27 @@ namespace DataOperation.Services
             return isValid;
         }
 
-        public async Task StartProgramm()
+        public async Task StartProgramm(int index = 0)
         {
-            var files = SelectFiles().ToList();
+            List<FileInfo> files = null;
+
+            if (index != 0)
+            {
+                files = GetAddedFiles().ToList();
+            }
+            else if(index == 0)
+            {
+                files = SelectFiles().ToList();
+                LastlyState = files;
+            }
 
             if (files.Count > 0)
             {
                 var parametrs = await ReadFile(files);
 
-                for(int i =0; i < parametrs.Length; i++)
+                int i = index;
+
+                for( ; i < parametrs.Length; i++)
                 {
                     await CheckOrWriteFile(parametrs[i], files[i].FullName, i + 1);
                 }
@@ -205,6 +244,8 @@ namespace DataOperation.Services
             {
                 Console.WriteLine("No files");
             }
+
+            StartOrStopTimer(true);
         }
 
         private string GetPathFolder()
@@ -226,7 +267,7 @@ namespace DataOperation.Services
             return startFolder;
         }
 
-        public async Task SaveFile(int index) 
+        private async Task SaveFile(int index) 
         {
             string path = GetPathFolder();
             _logService.CreateFolder(path);
@@ -234,7 +275,7 @@ namespace DataOperation.Services
             await _logService.WriteToJSONAsync(roots, startFolder);
         }
 
-        public void CreateModel(string[] parametrs)
+        private void CreateModel(string[] parametrs)
         {
             if (parametrs is not null) 
             {
@@ -262,28 +303,21 @@ namespace DataOperation.Services
             }
         }
 
-        public string[] SplitString(string paymentData)
+        private string[] SplitString(string paymentData)
         {
             var parametrs = paymentData.Split(new string[] { ", ", "“", "”", " " }, StringSplitOptions.RemoveEmptyEntries);
 
             return parametrs;
         }
 
-        public Payer CreatePayment(string[] dataPayment)
+        private Payer CreatePayment(string[] dataPayment)
         {
             Payer payer = new Payer();
 
-            try
-            {
-                payer.Name = $"{dataPayment[0]} {dataPayment[1]}";
-                payer.Payment = decimal.Parse(dataPayment[6], CultureInfo.InvariantCulture);
-                payer.Date = ConvertDate(dataPayment[7]);
-                payer.AccountNumber = long.Parse(dataPayment[8]);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error:" + ex.Message);
-            }
+            payer.Name = $"{dataPayment[0]} {dataPayment[1]}";
+            payer.Payment = decimal.Parse(dataPayment[6], CultureInfo.InvariantCulture);
+            payer.Date = ConvertDate(dataPayment[7]);
+            payer.AccountNumber = long.Parse(dataPayment[8]);
 
             return payer;
         }
@@ -331,12 +365,6 @@ namespace DataOperation.Services
             DateTime.TryParseExact(data, "yyyy-MM-dd", new CultureInfo("en-US"), DateTimeStyles.None, out date);
 
             return date;
-        }
-
-        private string[] UpdateFolder()
-        {
-
-            return string[];
         }
     }
 }
