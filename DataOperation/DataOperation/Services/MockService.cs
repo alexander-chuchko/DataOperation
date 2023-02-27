@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DataOperation.Services
 {
@@ -36,14 +37,14 @@ namespace DataOperation.Services
             };
         }
 
-        public void GenerationMock()
+        public async Task GenerationMockAsync()
         {
             try
             {
                 _logService.CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"]));
                 _logService.CreateFolder(Path.Combine(ConfigurationManager.AppSettings["pathToFolderB"]));
 
-                CreatePayerFiles(GetPayers());
+                await CreatePayerFiles(GetPayers());
             }
             catch (Exception ex)
             {
@@ -51,12 +52,13 @@ namespace DataOperation.Services
             }
         }
 
-        private void CreatePayerFiles(IEnumerable<string>colection)
+        private async Task CreatePayerFiles(IEnumerable<string>colection)
         {
             if (colection is List<string> payers)
             {
                 Random random = new Random();
                 string logFilePath = string.Empty;
+                int indexFile = 1;
 
                 for (int i = 0; i < ITEM_GENERATION_FILE * NUMBER_PAYMENTS; i++)
                 {
@@ -66,10 +68,11 @@ namespace DataOperation.Services
 
                     if (i % NUMBER_PAYMENTS == 0)
                     {
-                        logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], CreateName(i));
+                        logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], CreateName(indexFile));
+                        indexFile++;
                     }
 
-                    _logService.Write(payer, logFilePath);
+                   await _logService.WriteAsync(payer, logFilePath);
 
                     payers.RemoveAt(index);
                 }
@@ -82,7 +85,7 @@ namespace DataOperation.Services
             string extension = random.Next(0, 9) % 2 == 0 ?
             ".TXT" :
             ".CSV";
-            return $"source{index}extension";
+            return $"source{index}{extension}";
         }
     }
 }

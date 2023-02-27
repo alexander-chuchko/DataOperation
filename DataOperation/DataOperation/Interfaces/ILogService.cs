@@ -7,9 +7,9 @@ namespace DataOperation.Interfaces
 {
     public interface ILogService
     {
-        void Write(string logInfo, string path);
-        string Read(string path);
-        Task<string> ReadAllTextAsync();
+        Task WriteAsync(string logInfo, string path);
+        Task<string> ReadAsync(string path);
+        Task<string> ReadAllTextAsync(string path);
         Task WriteToJSONAsync(IEnumerable<Root> collection, string path);
         void CreateFolder(string path);
     }

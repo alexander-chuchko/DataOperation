@@ -1,5 +1,4 @@
-﻿
-using DataOperation.Interfaces;
+﻿using DataOperation.Interfaces;
 using DataOperation.Models;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
@@ -10,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Configuration;
+
 
 namespace DataOperation.Services
 {
@@ -22,7 +22,7 @@ namespace DataOperation.Services
         public static string logFilePath = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"], "transactions.log"); //$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
         public static string logFilePath1 =$@"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\transactions.log";
 
-        public string Read(string path)
+        public async Task<string> ReadAsync(string path)
         {
             string readTransactions = null;
 
@@ -34,7 +34,9 @@ namespace DataOperation.Services
             using (var file = new StreamReader(path))
             {
                 //To make async method
-                readTransactions = file.ReadToEnd();
+                Console.WriteLine($"Begin read in method ReadAsync {path}");
+                readTransactions = await file.ReadToEndAsync();
+                Console.WriteLine($"End read in method ReadAsync {path}");
             }
 
             return readTransactions?.Length > default(int) ?
@@ -42,7 +44,7 @@ namespace DataOperation.Services
                 "There are no recorded payments";
         }
 
-        public void Write(string logInfo, string path)
+        public async Task WriteAsync(string logInfo, string path)
         {
             if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(logInfo))
             {
@@ -52,7 +54,7 @@ namespace DataOperation.Services
 
                 using (StreamWriter write = new StreamWriter(path, isFile))
                 {
-                    write.Write(formattedString);
+                    await write.WriteAsync(formattedString);
                 }
             }
         }
@@ -61,10 +63,15 @@ namespace DataOperation.Services
         {
             try
             {
+                Console.WriteLine($"Begin {path}");
                 await File.WriteAllTextAsync(path, JsonConvert.SerializeObject(collection,
                     Formatting.Indented,
-                    new JsonSerializerSettings { DateFormatString = "yyyy-MM-dd", 
-                        ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+                    new JsonSerializerSettings
+                    {
+                        DateFormatString = "yyyy-MM-dd",
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    }));
+                Console.WriteLine($"End {path}");
 
             }
             catch (Exception ex)
@@ -73,9 +80,10 @@ namespace DataOperation.Services
             }
         }
 
-        public async Task<string> ReadAllTextAsync()
+        public async Task<string> ReadAllTextAsync(string path)
         {
-            using (var sourceStream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, DefaultOptions))
+            Console.WriteLine(path);
+            using (var sourceStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, DefaultOptions))
             {
                 var sb = new StringBuilder();
                 var buffer = new byte[0x1000];
@@ -84,8 +92,8 @@ namespace DataOperation.Services
                 while ((numRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
                     sb.Append(Encoding.Unicode.GetString(buffer, 0, numRead));
-                }    
-
+                }
+                Console.WriteLine(path);
                 return sb.ToString();
             }
         }

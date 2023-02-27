@@ -1,93 +1,247 @@
-﻿using DataOperation.Models;
+﻿using DataOperation.Interfaces;
+using DataOperation.Models;
 using DataOperation.Services;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace DataOperation
 {
     public class Program
     {
-        private static void GetAllStrings()
+
+        static async Task<string> ReadFromFileAsync(string filePath, int bufferSize = 1024)
         {
-            LogService logService = new LogService();
-            Task<string> getAllStrings = logService.ReadAllTextAsync();
-            getAllStrings.ContinueWith(_ => 
+            if (bufferSize < 1024)
+                throw new ArgumentNullException("bufferSize");
+
+            if (string.IsNullOrEmpty(filePath))
+
+                throw new ArgumentNullException("filePath");
+
+            StringBuilder readBuffer = null;
+
+            byte[] buffer = new byte[bufferSize];
+
+            FileStream fileStream = null;
+
+            try
             {
-                var lists = getAllStrings.Result;
+                Console.WriteLine($"Begin read in method ReadFromFileAsync {filePath}");
 
-                Console.WriteLine("HelloWWWWWWWWWWWWWWW");
-            });
+                readBuffer = new StringBuilder();
 
-        } 
-        static void Main(string[] args)
-        {
+                fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read,
 
+                FileShare.Read, bufferSize: bufferSize, useAsync: true);
 
-            //DriveInfo[] allDrives = DriveInfo.GetDrives();
-            //string fileName = System.IO.Path.GetRandomFileName();
-            //MockService mockService = new MockService(new LogService());
+                Int32 bytesRead = 0;
 
-            PaymentService paymentService = new PaymentService(new LogService());
-            //en-GB
-            //en-US
-            DateTime dateTime = DateTime.Now;
-            var res = dateTime.ToString("dd-mm-yyyy");
-            string name = string.Concat(dateTime.Day, '-', dateTime.Month, '-', dateTime.Year).ToString();
-            paymentService.StartProgramm();
-            //paymentService.StartProgramm();
-
-
-            //LogService logService = new LogService();
-            //GetAllStrings();
-
-            //string arrayTransaction = "John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water"; //paymentService.ReadFromLog();
-            //var transactions2 = arrayTransaction.Split(new string[] { ", ", "“", "”", " "}, StringSplitOptions.RemoveEmptyEntries);
-
-            //var transactions = arrayTransaction.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            //var transactions1 = transactions[1].Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
-            /*
-            List<Root> roots = new List<Root>();
-
-            foreach (var item in transactions)
-            {
-                var arrayWords = item.Split(new string[] { ", ", "“", "”", "'\"" }, StringSplitOptions.RemoveEmptyEntries);
-                Payer payer = new Payer()
+                while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
-                    Name = String.Concat(arrayWords[0],
-                    arrayWords[1]),
-                    Payment = Decimal.Parse(arrayWords[6]),
-                    AccountNumber = int.Parse(arrayWords[7]),
-                    Date = DateTime.Parse(arrayWords[8]),
-                };
-                
+                    readBuffer.Append(Encoding.Unicode.GetString(buffer, 0, bytesRead));
 
-                Root root = new Root(); 
-                root.City = arrayWords[3];
+                }
 
             }
-            */
-
-
-            //"John, Doe, “Lviv, Kleparivska 35, 4”, 500.0, 2022-27-01, 1234567, Water",
-
-            //List<string> list = new List<string>();
-            /*
-            foreach (var item in transactions)
+            catch
             {
-                list.Add(item);
+                readBuffer = null;
+
+                //Write code here to handle exceptions;
+            }
+            finally
+            {
+
+                if (fileStream != null)
+
+                    fileStream.Dispose();
+            }
+
+            Console.WriteLine($"End read in method ReadFromFileAsync {filePath}");
+
+            return readBuffer.ToString();
+
+        }
+
+        public static async Task<string> CheckOrReadFile(FileInfo file)
+        {
+                Console.WriteLine($"Work method CheckOrWriteFile {file.Name}");
+                //change
+                var contentFile = await ReadAsync(file.FullName);
+                Console.WriteLine($"Ended work method CheckOrWriteFile {file.Name}");
+
+            return file.Name;
+            
+        }
+
+        public static string ReadFile(FileInfo file)
+        {
+            Console.WriteLine($"Work method CheckOrWriteFile {file.Name}");
+            //change
+            var contentFile = Read(file.FullName);
+            Console.WriteLine($"Ended work method CheckOrWriteFile {file.Name}");
+
+            return file.Name;
+
+        }
+
+        public static IEnumerable<FileInfo> SelectFiles()
+        {
+            string invalidFiles = string.Empty;
+
+            IEnumerable<FileInfo> files = null;
+
+            var startFolder = Path.Combine(ConfigurationManager.AppSettings["pathToFolderA"]);
+
+            DirectoryInfo dir = new DirectoryInfo(startFolder);
+
+            if (dir.Exists)
+            {
+                files = dir.GetFiles("*.*", SearchOption.AllDirectories).Where(x =>
+                            (x.Extension.ToLower() == ".txt") || (x.Extension.ToLower() == ".csv"));
+
+            }
+
+            return files;
+        }
+
+        public static async Task<string> ReadAsync(string path)
+        {
+            string readTransactions = null;
+
+            if (!System.IO.File.Exists(path))
+            {
+                throw new System.InvalidOperationException();
+            }
+
+            using (var file = new StreamReader(path))
+            {
+                //To make async method
+                Console.WriteLine($"Work method ReadAsync {path}");
+                readTransactions = await file.ReadToEndAsync();
+                Console.WriteLine($"Ended work method ReadAsync {path}");
+            }
+
+            return path;
+        }
+
+        public static string Read(string path)
+        {
+            string readTransactions = null;
+
+            if (!System.IO.File.Exists(path))
+            {
+                throw new System.InvalidOperationException();
+            }
+
+            using (var file = new StreamReader(path))
+            {
+                //To make async method
+                Console.WriteLine($"Work method ReadAsync {path}");
+                readTransactions = file.ReadToEnd();
+                Console.WriteLine($"Ended work method ReadAsync {path}");
+            }
+
+            return readTransactions?.Length > default(int) ?
+                readTransactions :
+                "There are no recorded payments";
+        }
+
+
+
+        private static void GetAllStrings()
+        {
+            //Stopwatch stopwatch = Stopwatch.StartNew();
+            LogService logService = new LogService();
+            var res = SelectFiles();
+            foreach (var file in res)
+            {
+                Task <string>getAllStrings = ReadAsync(file.FullName);
+                getAllStrings.ContinueWith(_ =>
+                {
+                    var lists = getAllStrings.Result;
+
+                    //Console.WriteLine($"File {lists} read");
+                });
+            }
+
+            Console.WriteLine($"End Read!!!");
+            //stopwatch.Stop();
+            //Console.WriteLine(stopwatch.ElapsedMilliseconds);
+
+        }
+
+        private static async Task GetAllStrings1()
+        {
+            
+            LogService logService = new LogService();
+            var res = SelectFiles();
+
+            foreach (var file in res)
+            {
+                //await ReadFromFileAsync(file.FullName);
+                //await ReadAsync(file.FullName);
+                //Console.WriteLine($"Execute: {file.Name}");
+                Read(file.FullName);
+            }
+
+        }
+        static async Task Main(string[] args)
+        {
+            /*
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            
+            List<Task<string>> tasks1 = new List<Task<string>>();
+
+            IEnumerable<Task<string>> tasks = SelectFiles().Select(x => x.FullName).Select(ReadAsync).ToList();
+
+            Task<string[]> allTask = Task.WhenAll(tasks);
+            string[] strings = await allTask;*/
+
+
+            //Read(file.FullName);
+            //GetAllStrings();
+            //await GetAllStrings1();
+
+           // stopwatch.Stop();
+
+            //Console.WriteLine($"Time spend {stopwatch.ElapsedMilliseconds}");
+            /*
+            Dictionary<string, Action> commands = new Dictionary<string, Action>()
+            {
+                { "start", (() =>{ }),
+                { "stop", (() => Console.Clear()) }
+            };*/
+
+            //start/reset/stop 
+
+            //Console.Write("");
+            /*
+            while (true)
+            {
+                string input = Console.ReadLine();
+                if (commands.ContainsKey(input))
+                    commands[input]();
+                else
+                    Console.WriteLine("Unrecognized command: " + input);
             }*/
 
-            //string phonePattern = @"^[2-9]\d{2}-\d{3}
-
-
-
-            Console.WriteLine("Hello World!");
+            
+           PaymentService paymentService = new PaymentService(new LogService(), new MockService(new LogService()));
+            //MockService mockService = new MockService(new LogService());
+            //mockService.GenerationMock();
+           await paymentService.StartProgramm();
+           Console.ReadKey();
         }
     }
 }
