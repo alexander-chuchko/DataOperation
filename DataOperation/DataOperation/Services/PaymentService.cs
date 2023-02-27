@@ -17,15 +17,18 @@ namespace DataOperation.Services
     {
         private readonly ILogService _logService;
         private readonly IMockService _mockService;
+        private readonly ITimerService _checkTimer;
         public List<Root> roots { get; set; } = new List<Root>();
 
         public Report Report {get; set;} = new Report();
         public string[] LastlyState { get; set; }
 
-        public PaymentService(ILogService logService, IMockService mockService)
+        public PaymentService(ILogService logService, IMockService mockService, ITimerService checkTimer)
         {
             _logService = logService;   
             _mockService = mockService; 
+            _checkTimer = checkTimer;   
+            
         }
 
         public IEnumerable<FileInfo> SelectFiles()
@@ -50,6 +53,19 @@ namespace DataOperation.Services
             }
 
             return files;
+        }
+
+        private void StartOrStopTimer(bool value)
+        {
+            if(value)
+            {
+                _checkTimer.Interval = 1000;
+                _checkTimer.Start();
+            }
+            else if(value)
+            {
+                _checkTimer.Stop();
+            }
         }
 
         public async Task<string[]> ReadFile(IEnumerable<FileInfo> files)
